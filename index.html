@@ -30,6 +30,22 @@
       font-size: 16px;
       cursor: pointer;
     }
+    #leaderboard {
+      margin-top: 20px;
+      width: 200px;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #333;
+    }
+    #leaderboard table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #leaderboard th, #leaderboard td {
+      padding: 5px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
@@ -45,18 +61,36 @@
   <div id="score" style="display:none;">Skor: 0</div>
   <div id="highScore" style="display:none;">En Yüksek Skor: 0</div>
   
+  <button id="restartButton" style="display:none;" onclick="restartGame()">Yeniden Başlat</button>
+  
+  <div id="leaderboard">
+    <h2>Oyuncu Tablosu</h2>
+    <table id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>Kullanıcı Adı</th>
+          <th>Skor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- En yüksek skorlar burada görüntülenecek -->
+      </tbody>
+    </table>
+  </div>
+
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const box = 20;
     let score = 0;
-    let highScore = localStorage.getItem("highScore") ? localStorage.getItem("highScore") : 0;
     let username = "";
     
     let snake;
     let food;
     let direction;
     let game;
+
+    let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 
     document.getElementById("startGame").addEventListener("click", startGame);
     
@@ -71,6 +105,7 @@
       document.getElementById("gameCanvas").style.display = "block";
       document.getElementById("score").style.display = "block";
       document.getElementById("highScore").style.display = "block";
+      document.getElementById("restartButton").style.display = "none";
       
       score = 0;
       snake = [{ x: 10 * box, y: 10 * box }];
@@ -78,12 +113,12 @@
       food = generateFood();
       
       document.getElementById("score").textContent = "Skor: " + score;
-      document.getElementById("highScore").textContent = "En Yüksek Skor: " + highScore;
+      document.getElementById("highScore").textContent = "En Yüksek Skor: " + Math.max(...leaderboard.map(player => player.score), 0);
       
       document.addEventListener("keydown", changeDirection);
       game = setInterval(draw, 100);
     }
-    
+
     function changeDirection(e) {
       if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
       else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
@@ -129,12 +164,15 @@
         snake.some((segment, i) => i !== 0 && segment.x === headX && segment.y === headY)
       ) {
         clearInterval(game);
-        if (score > highScore) {
-          highScore = score;
-          localStorage.setItem("highScore", highScore);
-        }
+        leaderboard.push({ username, score });
+        leaderboard.sort((a, b) => b.score - a.score);  // Skorları azalan sıraya göre sırala
+        leaderboard = leaderboard.slice(0, 5); // En yüksek 5 oyuncuyu tut
+        localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+        
+        updateLeaderboard();
+        
         alert("Oyun bitti! Skorun: " + score);
-        document.getElementById("startButton").style.display = "inline-block";
+        document.getElementById("restartButton").style.display = "inline-block";
         return;
       }
 
@@ -150,6 +188,24 @@
       }
 
       snake.unshift(newHead);
+    }
+
+    function updateLeaderboard() {
+      const leaderboardTable = document.getElementById("leaderboardTable").getElementsByTagName('tbody')[0];
+      leaderboardTable.innerHTML = "";
+      
+      leaderboard.forEach(player => {
+        const row = leaderboardTable.insertRow();
+        const usernameCell = row.insertCell(0);
+        const scoreCell = row.insertCell(1);
+        usernameCell.textContent = player.username;
+        scoreCell.textContent = player.score;
+      });
+    }
+
+    function restartGame() {
+      document.getElementById("restartButton").style.display = "none";
+      startGame();
     }
   </script>
 </body>
