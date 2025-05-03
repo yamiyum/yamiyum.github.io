@@ -2,84 +2,105 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Balon Patlatma Oyunu</title>
+  <title>Taş Kağıt Makas - Öğrenen Bot</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #a0e8ff;
-      margin: 0;
-      overflow: hidden;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding-top: 50px;
     }
-
-    #game-area {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+    h1 {
+      color: #333;
     }
-
-    .balloon {
-      position: absolute;
-      width: 60px;
-      height: 80px;
-      background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      cursor: pointer;
-      transition: transform 0.1s;
+    .choices {
+      margin-top: 30px;
     }
-
-    .balloon:active {
-      transform: scale(0.8);
-    }
-
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 10px;
+    button {
       font-size: 24px;
-      background: white;
-      padding: 10px 15px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
       border-radius: 10px;
-      box-shadow: 0 0 10px #999;
+      border: none;
+      background-color: #2196f3;
+      color: white;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0b7dda;
+    }
+    #result, #score {
+      font-size: 20px;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <div id="game-area">
-    <div id="score">Skor: 0</div>
+
+  <h1>Taş - Kağıt - Makas (Öğrenen Bot)</h1>
+
+  <div class="choices">
+    <button onclick="play('taş')">🪨 Taş</button>
+    <button onclick="play('kağıt')">📄 Kağıt</button>
+    <button onclick="play('makas')">✂️ Makas</button>
   </div>
 
+  <div id="result"></div>
+  <div id="score">Skor: Sen 0 - 0 Bot</div>
+
   <script>
-    const gameArea = document.getElementById('game-area');
-    const scoreDisplay = document.getElementById('score');
-    let score = 0;
+    const options = ["taş", "kağıt", "makas"];
+    let userChoices = [];
+    let userScore = 0;
+    let botScore = 0;
 
-    function createBalloon() {
-      const balloon = document.createElement('div');
-      balloon.classList.add('balloon');
-
-      const x = Math.random() * (window.innerWidth - 60);
-      const y = Math.random() * (window.innerHeight - 80);
-      balloon.style.left = `${x}px`;
-      balloon.style.top = `${y}px`;
-
-      balloon.addEventListener('click', () => {
-        score++;
-        scoreDisplay.textContent = `Skor: ${score}`;
-        balloon.remove();
-      });
-
-      gameArea.appendChild(balloon);
-
-      // Otomatik kaybolma (patlamazsa 2 saniyede)
-      setTimeout(() => {
-        if (balloon.parentElement) balloon.remove();
-      }, 2000);
+    function getCounterChoice(choice) {
+      // Bu fonksiyon verilen bir seçimin karşısını döndürür
+      if (choice === "taş") return "kağıt";
+      if (choice === "kağıt") return "makas";
+      if (choice === "makas") return "taş";
     }
 
-    // Her 600ms'de bir balon üret
-    setInterval(createBalloon, 600);
-  </script>
-</body>
-</html>
+    function predictUserChoice() {
+      if (userChoices.length < 3) {
+        // Henüz yeterli veri yoksa rastgele seçim
+        return options[Math.floor(Math.random() * 3)];
+      }
 
+      // Oyuncunun en çok yaptığı seçimi tahmin et
+      const counts = { "taş": 0, "kağıt": 0, "makas": 0 };
+      userChoices.forEach(choice => counts[choice]++);
+      const mostUsed = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+
+      // Onu yenecek hamleyi seç
+      return getCounterChoice(mostUsed);
+    }
+
+    function play(userChoice) {
+      userChoices.push(userChoice);
+      if (userChoices.length > 20) userChoices.shift(); // son 20 hamleyi tut
+
+      const botChoice = predictUserChoice();
+      let result = "";
+
+      if (userChoice === botChoice) {
+        result = `Berabere! İkiniz de ${userChoice} seçtiniz.`;
+      } else if (
+        (userChoice === "taş" && botChoice === "makas") ||
+        (userChoice === "kağıt" && botChoice === "taş") ||
+        (userChoice === "makas" && botChoice === "kağıt")
+      ) {
+        result = `Kazandın! Sen ${userChoice}, bot ${botChoice} seçti.`;
+        userScore++;
+      } else {
+        result = `Kaybettin! Sen ${userChoice}, bot ${botChoice} seçti.`;
+        botScore++;
+      }
+
+      document.getElementById("result").textContent = result;
+      document.getElementById("score").textContent = `Skor: Sen ${userScore} - ${botScore} Bot`;
+    }
+  </script>
+
+</body>
