@@ -74,7 +74,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- En yüksek skorlar burada görüntülenecek -->
+        
       </tbody>
     </table>
   </div>
@@ -138,17 +138,17 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Yılan
+
       for (let i = 0; i < snake.length; i++) {
         ctx.fillStyle = i === 0 ? "green" : "lime";
         ctx.fillRect(snake[i].x, snake[i].y, box, box);
       }
 
-      // Yemek
+      
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, box, box);
 
-      // Baş konum
+     
       let headX = snake[0].x;
       let headY = snake[0].y;
 
@@ -157,7 +157,7 @@
       if (direction === "UP") headY -= box;
       if (direction === "DOWN") headY += box;
 
-      // Duvara veya kendine çarpma
+      
       if (
         headX < 0 ||
         headY < 0 ||
@@ -180,7 +180,7 @@
 
       let newHead = { x: headX, y: headY };
 
-      // Yemek yeme
+      
       if (headX === food.x && headY === food.y) {
         score++;
         document.getElementById("score").textContent = "Skor: " + score;
