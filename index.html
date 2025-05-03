@@ -24,7 +24,7 @@
       margin-top: 15px;
       font-size: 18px;
     }
-    #startButton {
+    #startButton, #changeUsernameButton {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 16px;
@@ -55,6 +55,7 @@
     <label for="username">Kullanıcı Adı: </label>
     <input type="text" id="username" />
     <button id="startGame">Oyuna Başla</button>
+    <button id="changeUsernameButton" style="display:none;" onclick="changeUsername()">Kullanıcı Adı Değiştir</button>
   </div>
   
   <canvas id="gameCanvas" width="400" height="400" style="display:none;"></canvas>
@@ -105,6 +106,7 @@
       document.getElementById("gameCanvas").style.display = "block";
       document.getElementById("score").style.display = "block";
       document.getElementById("highScore").style.display = "block";
+      document.getElementById("changeUsernameButton").style.display = "inline-block";
       document.getElementById("restartButton").style.display = "none";
       
       score = 0;
@@ -206,6 +208,13 @@
     function restartGame() {
       document.getElementById("restartButton").style.display = "none";
       startGame();
+    }
+
+    function changeUsername() {
+      document.getElementById("username").disabled = false;
+      document.getElementById("username").focus();
+      document.getElementById("changeUsernameButton").style.display = "none";
+      document.getElementById("startGame").style.display = "inline-block";
     }
   </script>
 </body>
