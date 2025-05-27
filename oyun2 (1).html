@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="400" style="background-color:rgb(238, 238, 238) ;"></canvas><BR></BR>
+    <h1>SKOR</h1> <label id="skor" style="font-size:xx-large;">0</label><br>
+    <div id="oyunbitti" style="font-size: 20px;color:red;"></div>    
+    <script>
+        var canvas=document.getElementById("canvas");
+        var ctx=canvas.getContext("2d");
+        
+        const speedX=10;
+        let a=false;
+        let a1=false;
+        let x=250;
+        let y=350;
+        let xx=350;
+        let yy=350;
+        let kare_x=0;
+        let kare_y=20;
+        let kare=false;
+        let kare_hızı=10;
+        let oyunbitti=false;
+        function animate(){
+            if(oyunbitti==true){return;}
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+
+            ctx.fillStyle="red";
+            ctx.fillRect(kare_x,kare_y,50,50)
+
+            ctx.fillStyle="blue";
+            ctx.fillRect(x,y,50,50)
+
+            ctx.fillStyle="green";
+            ctx.fillRect(xx,yy,50,50)
+
+            if(y<kare_y+40&&y>kare_y-45&&x<kare_x+40&&x>kare_x-45){
+                document.getElementById("oyunbitti").innerHTML="OYUN BİTTİ"
+                    oyunbitti=true;
+                }
+            
+
+                if(yy<kare_y+40&&yy>kare_y-45&&xx<kare_x+40&&xx>kare_x-45){
+                document.getElementById("oyunbitti").innerHTML="OYUN BİTTİ"
+                    oyunbitti=true;
+                }
+
+            if(y==-30){
+                document.getElementById("skor").innerText++;
+            }
+
+            if(yy==-30){
+                document.getElementById("skor").innerText++;
+            }
+
+            if(a==true){
+                y-=speedX;
+                
+            }
+
+            if(a1==true){
+                yy-=speedX;
+                
+            }
+
+            requestAnimationFrame(animate);
+
+
+            if(kare_x>550)
+            {
+                kare=true;
+            }
+
+            if(kare_x<a){
+                kare=false;
+            }
+
+            if(kare==true)
+            {
+                kare_x-=kare_hızı
+            }
+
+            else{
+                kare_x+=kare_hızı
+            }
+           
+
+        }
+        animate();
+
+        function move(e){
+            
+            if(e.key=="w"||e.key=="ArrowUp"){
+                a=true;
+                if(y<-50)
+                {
+                    y=400;
+                    
+                }
+            }
+            if(e.key=="q"||e.key=="ArrowLeft"){
+                a1=true;
+                if(yy<-50)
+                {
+                    yy=400;
+                    
+                }
+            }
+        }
+        addEventListener("keydown",move);
+    </script>
+</body>
+</html>
